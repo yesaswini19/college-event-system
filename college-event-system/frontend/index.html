@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>College Event Registration System | VVIT</title>
+<title>College Event Registration System</title>
+
+<style>
+body {
+  font-family: Arial;
+  background:#f4f4f4;
+  text-align:center;
+}
+
+h1 {
+  margin-bottom: 20px;
+}
+
+.role-box {
+  width:50%;
+  margin:15px auto;
+  padding:15px;
+  background:#333;
+  color:white;
+  cursor:pointer;
+  font-size:20px;
+  border-radius:6px;
+}
+
+.content {
+  display:none;
+  background:white;
+  padding:20px;
+  width:50%;
+  margin:auto;
+  border-radius:6px;
+}
+
+input, select, button {
+  width:100%;
+  padding:8px;
+  margin:5px 0;
+}
+
+button {
+  background:#007bff;
+  color:white;
+  border:none;
+  cursor:pointer;
+}
+</style>
+
+<script>
+const organizerPassword = "admin123";
+
+/* ================= STUDENT TOGGLE ================= */
+function toggleStudent() {
+  const box = document.getElementById("studentBox");
+  box.style.display = box.style.display === "block" ? "none" : "block";
+
+  if (box.style.display === "block") {
+    loadEventsForStudents(); // ✅ load events dropdown
+  }
+}
+
+/* ================= ORGANIZER TOGGLE ================= */
+function toggleOrganizer() {
+  const pass = prompt("Enter Organizer Password:");
+
+  if (pass === organizerPassword) {
+    const box = document.getElementById("organizerBox");
+    box.style.display = box.style.display === "block" ? "none" : "block";
+
+    if (box.style.display === "block") {
+      loadEventsForOrganizer(); // ✅ load delete dropdown
+    }
+  } else {
+    alert("❌ Access Denied");
+  }
+}
+</script>
+</head>
+
+<body>
+
+<h1>College Event Registration System</h1>
+
+<!-- ================= STUDENT ================= -->
+<div class="role-box" onclick="toggleStudent()">STUDENT</div>
+
+<div class="content" id="studentBox">
+
+  <h3>Add Student</h3>
+  <input id="studentName" placeholder="Student Name">
+  <input id="rollNo" placeholder="Roll No">
+  <button onclick="addStudent()">Add Student</button>
+
+  <h3>Edit Student</h3>
+  <input id="editStudentId" placeholder="Student ID">
+  <input id="editStudentName" placeholder="New Name">
+  <input id="editStudentRoll" placeholder="New Roll No">
+  <button onclick="editStudent()">Edit Student</button>
+
+  <h3>Delete Student</h3>
+  <input id="deleteStudentId" placeholder="Student ID">
+  <button onclick="deleteStudent()">Delete Student</button>
+
+  <h3>Register for Event</h3>
+  <input id="studentId" placeholder="Student ID">
+
+  <!-- ✅ EVENT MENU -->
+  <select id="eventSelect">
+    <option value="">-- Select Event --</option>
+  </select>
+
+  <button onclick="registerEvent()">Register</button>
+</div>
+
+<!-- ================= ORGANIZER ================= -->
+<div class="role-box" onclick="toggleOrganizer()">ORGANIZER 🔒</div>
+
+<div class="content" id="organizerBox">
+
+  <h3>Add Event</h3>
+  <input id="eventTitle" placeholder="Event Title">
+  <input id="eventDesc" placeholder="Description">
+  <input id="eventDate" type="date">
+  <button onclick="addEvent()">Add Event</button>
+
+  <h3>Delete Event</h3>
+  <!-- ✅ DROPDOWN (NO EVENT ID) -->
+  <select id="deleteEventSelect">
+    <option value="">-- Select Event to Delete --</option>
+  </select>
+  <button onclick="deleteEvent()">Delete Event</button>
+
+  <h3>View Registrations</h3>
+  <button onclick="viewRegistrations()">View Registrations</button>
+  <ul id="list"></ul>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>

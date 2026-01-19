@@ -1,148 +1,63 @@
 const API = "https://college-event-system-production.up.railway.app";
 
-/* ================= STUDENT FUNCTIONS ================= */
-
-// Add Student
+// --- 1. STUDENT FUNCTIONS ---
 function addStudent() {
   const name = document.getElementById("studentName").value;
   const roll = document.getElementById("rollNo").value;
+  if(!name || !roll) return alert("Please fill all fields");
 
   fetch(API + "/students", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ name, roll_no: roll })
-  })
-  .then(res => res.json())
-  .then(data => {
+  }).then(res => res.json()).then(data => {
     alert(data.message || "Student added successfully");
-    document.getElementById("studentName").value = "";
-    document.getElementById("rollNo").value = "";
   });
 }
 
-// Edit Student
-function editStudent() {
-  fetch(API + "/students/" + document.getElementById("editStudentId").value, {
-    method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      name: document.getElementById("editStudentName").value,
-      roll_no: document.getElementById("editStudentRoll").value
-    })
-  })
-  .then(res => res.json())
-  .then(data => alert(data.message || "Student updated"));
-}
-
-// Delete Student
-function deleteStudent() {
-  fetch(API + "/students/" + document.getElementById("deleteStudentId").value, {
-    method: "DELETE"
-  })
-  .then(res => res.json())
-  .then(data => alert(data.message || "Student deleted"));
-}
-
-// Load Events for Students
-function loadEventsForStudents() {
-  fetch(API + "/events")
-    .then(res => res.json())
-    .then(events => {
-      const select = document.getElementById("eventSelect");
-      select.innerHTML = `<option value="">-- Select Event --</option>`;
-
-      events.forEach(e => {
-        const opt = document.createElement("option");
-        opt.value = e.event_id;
-        opt.textContent = `${e.title} (${e.event_date})`;
-        select.appendChild(opt);
-      });
-    });
-}
-
-// Register Event
 function registerEvent() {
   const studentId = document.getElementById("studentId").value;
   const eventId = document.getElementById("eventSelect").value;
-
-  if (!studentId || !eventId) {
-    alert("❌ Enter Student ID and select Event");
-    return;
-  }
+  if(!studentId || !eventId) return alert("Select event and enter ID");
 
   fetch(API + "/register", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ student_id: studentId, event_id: eventId })
-  })
-  .then(res => res.json())
-  .then(data => alert(data.message || "Registered successfully"));
+  }).then(res => res.json()).then(data => alert(data.message));
 }
 
-/* ================= ORGANIZER FUNCTIONS ================= */
-
-// Load Events for Organizer
-function loadEventsForOrganizer() {
-  fetch(API + "/events")
-    .then(res => res.json())
-    .then(events => {
-      const select = document.getElementById("deleteEventSelect");
-      select.innerHTML = `<option value="">-- Select Event to Delete --</option>`;
-
-      events.forEach(e => {
-        const opt = document.createElement("option");
-        opt.value = e.event_id;
-        opt.textContent = `${e.title} (${e.event_date})`;
-        select.appendChild(opt);
-      });
-    });
-}
-
-// Add Event
+// --- 2. ORGANIZER FUNCTIONS ---
 function addEvent() {
+  const title = document.getElementById("eventTitle").value;
+  const description = document.getElementById("eventDesc").value;
+  const date = document.getElementById("eventDate").value;
+
   fetch(API + "/events", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      title: document.getElementById("eventTitle").value,
-      description: document.getElementById("eventDesc").value,
-      event_date: document.getElementById("eventDate").value
-    })
-  })
-  .then(res => res.json())
-  .then(data => {
-    alert(data.message || "Event added");
-    loadEventsForStudents();
+    body: JSON.stringify({ title, description, date })
+  }).then(res => res.json()).then(data => {
+    alert("Event Added!");
     loadEventsForOrganizer();
-    document.getElementById("eventTitle").value = "";
-    document.getElementById("eventDesc").value = "";
-    document.getElementById("eventDate").value = "";
+    loadEventsForCSV();
   });
 }
 
-// Delete Event
+// NEW: Added missing deleteEvent function
 function deleteEvent() {
-  const select = document.getElementById("deleteEventSelect");
-  const eventId = select.value;
+  const eventId = document.getElementById("deleteEventSelect").value;
+  if(!eventId) return alert("Please select an event to delete");
 
-  if (!eventId) {
-    alert("❌ Please select an event");
-    return;
-  }
-
-  fetch(API + "/events/" + eventId, { method: "DELETE" })
-    .then(res => res.json())
-    .then(data => {
-      alert(data.message || "Event deleted");
-
-      // 🔥 HARD REFRESH FROM SERVER
-      loadEventsForOrganizer();
-      loadEventsForStudents();
-    });
+  fetch(API + "/events/" + eventId, {
+    method: "DELETE"
+  }).then(res => res.json()).then(data => {
+    alert(data.message || "Event deleted");
+    loadEventsForOrganizer();
+    loadEventsForCSV();
+  });
 }
 
-
-// View Registrations
 function viewRegistrations() {
   fetch(API + "/registrations")
     .then(res => res.json())
@@ -152,5 +67,96 @@ function viewRegistrations() {
       data.forEach(r => {
         list.innerHTML += `<li>${r.name} (${r.roll_no}) → ${r.title}</li>`;
       });
+    });
+}
+
+// --- 3. DROPDOWN LOADERS ---
+function loadEventsForStudents() {
+  fetch(API + "/events")
+    .then(res => res.json())
+    .then(events => {
+      const select = document.getElementById("eventSelect");
+      select.innerHTML = `<option value="">-- Select Event --</option>`;
+      events.forEach(e => {
+        select.innerHTML += `<option value="${e.event_id}">${e.title}</option>`;
+      });
+    });
+}
+
+function loadEventsForOrganizer() {
+  fetch(API + "/events")
+    .then(res => res.json())
+    .then(events => {
+      const select = document.getElementById("deleteEventSelect");
+      if (!select) return;
+      select.innerHTML = `<option value="">-- Select Event --</option>`;
+      events.forEach(e => {
+        select.innerHTML += `<option value="${e.event_id}">${e.title}</option>`;
+      });
+    });
+}
+
+function loadEventsForCSV() {
+  fetch(API + "/events")
+    .then(res => res.json())
+    .then(events => {
+      const select = document.getElementById("csvEventSelect");
+      if (!select) return;
+      select.innerHTML = `<option value="">-- Select Event --</option>`;
+      events.forEach(e => {
+        select.innerHTML += `<option value="${e.event_id}">${e.title}</option>`;
+      });
+    });
+}
+
+// --- 4. CSV EXPORT LOGIC ---
+function downloadCSVByEvent() {
+  const select = document.getElementById("csvEventSelect");
+  const eventId = select.value;
+  const eventTitle = select.options[select.selectedIndex].text;
+
+  if (!eventId) return alert("Please select an event");
+
+  fetch(API + "/registrations")
+    .then(res => res.json())
+    .then(data => {
+      // DEBUG: This will show you what the data actually looks like in the Console
+      console.log("Registrations Data:", data);
+      console.log("Searching for Event ID:", eventId);
+
+      // We filter by checking the event_id or the title to be safe
+      const filtered = data.filter(r => {
+          const matchId = String(r.event_id) === String(eventId);
+          const matchTitle = r.title === eventTitle;
+          return matchId || matchTitle;
+      });
+
+      if (filtered.length === 0) {
+        return alert("No registrations for this event. Check Console (F12) for data details.");
+      }
+
+      let csv = "Student Name,Roll No,Event Title\n";
+      filtered.forEach(r => { csv += `${r.name},${r.roll_no},${r.title}\n`; });
+
+      const blob = new Blob([csv], { type: "text/csv" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = `${eventTitle}_Registrations.csv`;
+      link.click();
+    });
+}
+
+function downloadCSV() {
+  fetch(API + "/registrations")
+    .then(res => res.json())
+    .then(data => {
+      if (data.length === 0) return alert("No registrations found");
+      let csv = "Student Name,Roll No,Event Title\n";
+      data.forEach(r => { csv += `${r.name},${r.roll_no},${r.title}\n`; });
+      const blob = new Blob([csv], { type: "text/csv" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = "All_Registrations.csv";
+      link.click();
     });
 }

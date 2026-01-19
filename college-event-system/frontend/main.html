@@ -1,143 +1,183 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>College Event Registration System | VVIT</title>
-<title>College Event Registration System</title>
+    <meta charset="UTF-8">
+    <title>Event System | VVIT</title>
+    <style>
+        * { box-sizing: border-box; }
+        body, html { margin: 0; padding: 0; height: 100%; font-family: Arial, sans-serif; overflow: hidden; }
 
-<style>
-body {
-  font-family: Arial;
-  background:#f4f4f4;
-  text-align:center;
-}
+        .hero {
+            width: 100%;
+            height: 100vh;
+            background: url("vvit.jpg") center center / cover no-repeat;
+            background-attachment: fixed;
+        }
 
-h1 {
-  margin-bottom: 20px;
-}
+        .hero-overlay {
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            text-align: center;
+            pointer-events: none;
+        }
 
-.role-box {
-  width:50%;
-  margin:15px auto;
-  padding:15px;
-  background:#333;
-  color:white;
-  cursor:pointer;
-  font-size:20px;
-  border-radius:6px;
-}
+        #selectionScreen, .form-slide {
+            pointer-events: auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
 
-.content {
-  display:none;
-  background:white;
-  padding:20px;
-  width:50%;
-  margin:auto;
-  border-radius:6px;
-}
+        .role-box {
+            width: 320px;
+            margin: 15px;
+            padding: 25px;
+            background: #007bff;
+            color: white;
+            cursor: pointer;
+            font-size: 22px;
+            font-weight: bold;
+            border-radius: 10px;
+            transition: 0.3s;
+            border: 2px solid white;
+        }
 
-input, select, button {
-  width:100%;
-  padding:8px;
-  margin:5px 0;
-}
+        .role-box.organizer-bg { background: #002752; }
+        .role-box:hover { transform: scale(1.05); }
 
-button {
-  background:#007bff;
-  color:white;
-  border:none;
-  cursor:pointer;
-}
-</style>
+        .form-slide {
+            display: none;
+            width: 90%;
+            max-width: 500px;
+            background: white;
+            color: #333;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            max-height: 85vh;
+            overflow-y: auto;
+            text-align: left;
+        }
 
-<script>
-const organizerPassword = "admin123";
+        h2 { margin: 0 0 10px 0; color: #007bff; text-align: center; }
+        h4 { margin: 15px 0 5px 0; color: #666; font-size: 13px; text-transform: uppercase; }
 
-/* ================= STUDENT TOGGLE ================= */
-function toggleStudent() {
-  const box = document.getElementById("studentBox");
-  box.style.display = box.style.display === "block" ? "none" : "block";
+        input, select, button {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
 
-  if (box.style.display === "block") {
-    loadEventsForStudents(); // ✅ load events dropdown
-  }
-}
+        button { background: #28a745; color: white; font-weight: bold; border: none; cursor: pointer; }
+        .back-btn { background: #6c757d; margin-top: 20px; }
+        .dl-btn { background: #ffc107; color: black; }
 
-/* ================= ORGANIZER TOGGLE ================= */
-function toggleOrganizer() {
-  const pass = prompt("Enter Organizer Password:");
-
-  if (pass === organizerPassword) {
-    const box = document.getElementById("organizerBox");
-    box.style.display = box.style.display === "block" ? "none" : "block";
-
-    if (box.style.display === "block") {
-      loadEventsForOrganizer(); // ✅ load delete dropdown
-    }
-  } else {
-    alert("❌ Access Denied");
-  }
-}
-</script>
+        hr { margin: 20px 0; border: 0; border-top: 1px solid #eee; }
+    </style>
 </head>
 
 <body>
 
-<h1>College Event Registration System</h1>
+<div class="hero">
+    <div class="hero-overlay">
 
-<!-- ================= STUDENT ================= -->
-<div class="role-box" onclick="toggleStudent()">STUDENT</div>
+        <div id="selectionScreen">
+            <h1>Vasireddy Venkatadri Institute of Technology</h1>
+            <p>Event Registration System</p>
+            <div class="role-box" onclick="showSlide('studentSlide')">STUDENT</div>
+            <div class="role-box organizer-bg" onclick="checkOrganizer()">ORGANIZER 🔒</div>
+        </div>
 
-<div class="content" id="studentBox">
+        <div id="studentSlide" class="form-slide">
+            <h2>Student Portal</h2>
 
-  <h3>Add Student</h3>
-  <input id="studentName" placeholder="Student Name">
-  <input id="rollNo" placeholder="Roll No">
-  <button onclick="addStudent()">Add Student</button>
+            <h4>Add Profile</h4>
+            <input id="studentName" placeholder="Full Name">
+            <input id="rollNo" placeholder="Roll No">
+            <button onclick="addStudent()">Add Student</button>
 
-  <h3>Edit Student</h3>
-  <input id="editStudentId" placeholder="Student ID">
-  <input id="editStudentName" placeholder="New Name">
-  <input id="editStudentRoll" placeholder="New Roll No">
-  <button onclick="editStudent()">Edit Student</button>
+            <hr>
+            <h4>Edit / Update</h4>
+            <input id="editStudentId" placeholder="Student ID">
+            <input id="editStudentName" placeholder="New Name">
+            <input id="editStudentRoll" placeholder="New Roll No">
+            <button onclick="editStudent()" style="background:#ffc107; color:black;">Update Student</button>
 
-  <h3>Delete Student</h3>
-  <input id="deleteStudentId" placeholder="Student ID">
-  <button onclick="deleteStudent()">Delete Student</button>
+            <hr>
+            <h4>Delete Profile</h4>
+            <input id="deleteStudentId" placeholder="Student ID to remove">
+            <button onclick="deleteStudent()" style="background:#dc3545;">Delete Student</button>
 
-  <h3>Register for Event</h3>
-  <input id="studentId" placeholder="Student ID">
+            <hr>
+            <h4>Register for Event</h4>
+            <input id="studentId" placeholder="Your Student ID">
+            <select id="eventSelect"><option>-- Select Event --</option></select>
+            <button onclick="registerEvent()" style="background:#007bff;">Register</button>
 
-  <!-- ✅ EVENT MENU -->
-  <select id="eventSelect">
-    <option value="">-- Select Event --</option>
-  </select>
+            <button class="back-btn" onclick="showSlide('selectionScreen')">← Back</button>
+        </div>
 
-  <button onclick="registerEvent()">Register</button>
-</div>
+        <div id="organizerSlide" class="form-slide">
+            <h2>Organizer Portal</h2>
 
-<!-- ================= ORGANIZER ================= -->
-<div class="role-box" onclick="toggleOrganizer()">ORGANIZER 🔒</div>
+            <h4>Create Event</h4>
+            <input id="eventTitle" placeholder="Title">
+            <input id="eventDesc" placeholder="Description">
+            <input id="eventDate" type="date">
+            <button onclick="addEvent()">Add Event</button>
 
-<div class="content" id="organizerBox">
+            <hr>
+            <h4>Manage Events</h4>
+            <select id="deleteEventSelect"><option>-- Select Event --</option></select>
+            <button onclick="deleteEvent()" style="background:#dc3545;">Delete Event</button>
 
-  <h3>Add Event</h3>
-  <input id="eventTitle" placeholder="Event Title">
-  <input id="eventDesc" placeholder="Description">
-  <input id="eventDate" type="date">
-  <button onclick="addEvent()">Add Event</button>
+            <hr>
+            <h4>Downloads & Reports</h4>
+            <button class="dl-btn" onclick="downloadCSV()">📥 Download All Registrations</button>
+            <button style="background:#17a2b8" onclick="viewRegistrations()">View List</button>
+            <ul id="list" style="padding:0; list-style:none;"></ul>
 
-  <h3>Delete Event</h3>
-  <!-- ✅ DROPDOWN (NO EVENT ID) -->
-  <select id="deleteEventSelect">
-    <option value="">-- Select Event to Delete --</option>
-  </select>
-  <button onclick="deleteEvent()">Delete Event</button>
+            <!-- ================= NEW ADDITION (ONLY CHANGE) ================= -->
+            <h4>Download Event-wise CSV</h4>
+            <select id="csvEventSelect"></select>
+            <button onclick="downloadCSVByEvent()">Download CSV</button>
+            <!-- =============================================================== -->
 
-  <h3>View Registrations</h3>
-  <button onclick="viewRegistrations()">View Registrations</button>
-  <ul id="list"></ul>
+            <button class="back-btn" onclick="showSlide('selectionScreen')">← Back</button>
+        </div>
+
+    </div>
 </div>
 
 <script src="script.js"></script>
+<script>
+    function showSlide(slideId) {
+  document.getElementById('selectionScreen').style.display = 'none';
+  document.getElementById('studentSlide').style.display = 'none';
+  document.getElementById('organizerSlide').style.display = 'none';
+  document.getElementById(slideId).style.display = 'flex';
+
+  if(slideId === 'studentSlide') loadEventsForStudents();
+  if(slideId === 'organizerSlide') {
+    loadEventsForOrganizer();
+    loadEventsForCSV(); // ✅ ADD THIS LINE ONLY
+  }
+}
+
+
+    function checkOrganizer() {
+        if (prompt("Enter Password:") === "admin123") showSlide('organizerSlide');
+        else alert("Denied");
+    }
+</script>
+
 </body>
 </html>

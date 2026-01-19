@@ -1,15 +1,106 @@
-body {
-    font-family: Arial;
-    margin: 30px;
+* { box-sizing: border-box; }
+
+body, html {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  overflow: hidden; /* Prevents double scrollbars */
 }
 
-input {
-    margin: 5px;
-    padding: 5px;
+.hero {
+  width: 100%;
+  height: 100vh;
+  background: url("vvit.jpg") center center / cover no-repeat;
+  background-attachment: fixed;
+}
+
+.hero-overlay {
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7); 
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  text-align: center;
+  /* FIX: This allows clicks to reach the buttons below the overlay */
+  pointer-events: none; 
+}
+
+/* Updated Button Colors */
+.role-box {
+  width: 280px;
+  margin: 15px;
+  padding: 20px;
+  background: #007bff; /* Student Blue */
+  color: white;
+  cursor: pointer;
+  font-size: 22px;
+  font-weight: bold;
+  border-radius: 8px;
+  transition: 0.3s;
+  border: 2px solid rgba(255,255,255,0.2);
+  pointer-events: auto; /* FIX: Re-enables clicking */
+}
+
+.role-box.org-bg {
+  background: #002752; /* Dark Navy for Organizer */
+}
+
+.role-box:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 20px rgba(0, 123, 255, 0.5);
+}
+
+/* Slide Container Styles */
+.form-slide {
+  display: none; /* Hidden until clicked */
+  background: white;
+  color: black;
+  padding: 30px;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+  max-height: 85vh;
+  overflow-y: auto; /* Allows scrolling inside the form if it's long */
+  pointer-events: auto; /* FIX: Re-enables clicking */
+  text-align: left;
+}
+
+h2 { color: #007bff; text-align: center; margin-top: 0; }
+h4 { margin: 15px 0 5px; color: #666; font-size: 13px; text-transform: uppercase; }
+
+input, select, .action-btn {
+  width: 100%;
+  padding: 12px;
+  margin: 8px 0;
+  border-radius: 4px;
+  border: 1px solid #ccc;
 }
 
 button {
-    padding: 6px 10px;
-    margin: 5px;
-    cursor: pointer;
+  background: #28a745; /* Green for "Add" buttons */
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+  pointer-events: auto;
+}
+
+.back-btn {
+  background: #6c757d; /* Gray for Back button */
+  margin-top: 20px;
+}
+
+hr { border: 0; border-top: 1px solid #eee; margin: 20px 0; }
+
+/* View Registrations List */
+ul#list { padding: 0; list-style: none; }
+li { background: #f8f9fa; padding: 10px; margin-bottom: 5px; border-left: 4px solid #007bff; font-size: 14px; }
+
+.form-slide * {
+    pointer-events: auto;
 }

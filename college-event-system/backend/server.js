@@ -11,7 +11,27 @@ app.get("/", (req, res) => {
   res.send("College Event System Backend Running");
 });
 /* ================= STUDENTS ================= */
+// --- ADD THIS TO SERVER.JS ---
+// View All Students (Required for the frontend to find IDs by Roll No)
+app.get("/students", (req, res) => {
+  db.query("SELECT * FROM students", (err, result) => {
+    if (err) {
+      console.error("Fetch Students Error:", err);
+      return res.status(500).json({ message: "Failed to fetch students" });
+    }
+    res.json(result);
+  });
+});
 
+// Get a single student's ID by their Roll Number
+app.get("/students/roll/:roll_no", (req, res) => {
+  const roll = req.params.roll_no;
+  db.query("SELECT student_id FROM students WHERE roll_no = ?", [roll], (err, result) => {
+    if (err) return res.status(500).json({ message: "Database error" });
+    if (result.length === 0) return res.status(404).json({ message: "Student not found" });
+    res.json(result[0]); // Returns just { "student_id": 12 }
+  });
+});
 // Add Student
 // Inside your Add Student route
 app.post("/students", (req, res) => {

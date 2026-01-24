@@ -1,5 +1,19 @@
 const API = "https://college-event-system-production.up.railway.app";
 
+// --- HELPER FUNCTION ---
+// Converts Roll Number to numeric Student ID using your new backend route
+async function getStudentIdByRoll(roll) {
+  try {
+    const res = await fetch(API + "/students/roll/" + roll);
+    if (res.status === 404) return null;
+    const data = await res.json();
+    return data.student_id; 
+  } catch (err) {
+    console.error("Lookup error:", err);
+    return null;
+  }
+}
+
 // --- 1. STUDENT FUNCTIONS ---
 function addStudent() {
   const name = document.getElementById("studentName").value;
@@ -15,16 +29,20 @@ function addStudent() {
   });
 }
 
-function registerEvent() {
-  const studentId = document.getElementById("studentId").value;
+// UPDATED: Now looks up ID by Roll No automatically
+async function registerEvent() {
+  const rollNo = document.getElementById("studentId").value; // Input where student types Roll No
   const eventId = document.getElementById("eventSelect").value;
-  if(!studentId || !eventId) return alert("Select event and enter ID");
+  if(!rollNo || !eventId) return alert("Select event and enter Roll No");
+
+  const studentId = await getStudentIdByRoll(rollNo);
+  if (!studentId) return alert("❌ Roll Number not found. Please create a profile first.");
 
   fetch(API + "/register", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ student_id: studentId, event_id: eventId })
-  }).then(res => res.json()).then(data => alert(data.message));
+  }).then(res => res.json()).then(data => alert("✅ " + data.message));
 }
 
 // --- 2. ORGANIZER FUNCTIONS ---
@@ -36,7 +54,7 @@ function addEvent() {
   fetch(API + "/events", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ title, description, date })
+    body: JSON.stringify({ title, description, event_date: date }) // Ensure key matches server.js
   }).then(res => res.json()).then(data => {
     alert("Event Added!");
     loadEventsForOrganizer();
@@ -44,7 +62,6 @@ function addEvent() {
   });
 }
 
-// NEW: Added missing deleteEvent function
 function deleteEvent() {
   const eventId = document.getElementById("deleteEventSelect").value;
   if(!eventId) return alert("Please select an event to delete");
@@ -76,6 +93,7 @@ function loadEventsForStudents() {
     .then(res => res.json())
     .then(events => {
       const select = document.getElementById("eventSelect");
+      if (!select) return;
       select.innerHTML = `<option value="">-- Select Event --</option>`;
       events.forEach(e => {
         select.innerHTML += `<option value="${e.event_id}">${e.title}</option>`;
@@ -120,20 +138,9 @@ function downloadCSVByEvent() {
   fetch(API + "/registrations")
     .then(res => res.json())
     .then(data => {
-      // DEBUG: This will show you what the data actually looks like in the Console
-      console.log("Registrations Data:", data);
-      console.log("Searching for Event ID:", eventId);
+      const filtered = data.filter(r => r.title === eventTitle);
 
-      // We filter by checking the event_id or the title to be safe
-      const filtered = data.filter(r => {
-          const matchId = String(r.event_id) === String(eventId);
-          const matchTitle = r.title === eventTitle;
-          return matchId || matchTitle;
-      });
-
-      if (filtered.length === 0) {
-        return alert("No registrations for this event. Check Console (F12) for data details.");
-      }
+      if (filtered.length === 0) return alert("No registrations for this event.");
 
       let csv = "Student Name,Roll No,Event Title\n";
       filtered.forEach(r => { csv += `${r.name},${r.roll_no},${r.title}\n`; });

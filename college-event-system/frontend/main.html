@@ -97,33 +97,30 @@
         </div>
 
         <div id="studentSlide" class="form-slide">
-            <h2>Student Portal</h2>
+    <h2>Student Portal</h2>
 
-            <h4>Add Profile</h4>
-            <input id="studentName" placeholder="Full Name">
-            <input id="rollNo" placeholder="Roll No">
-            <button onclick="addStudent()">Add Student</button>
+    <h4>Add Profile</h4>
+    <input id="studentName" placeholder="Full Name">
+    <input id="rollNo" placeholder="Roll No">
+    <button onclick="addStudent()">Add Student</button>
 
-            <hr>
-            <h4>Edit / Update</h4>
-            <input id="editStudentId" placeholder="Student ID">
-            <input id="editStudentName" placeholder="New Name">
-            <input id="editStudentRoll" placeholder="New Roll No">
-            <button onclick="editStudent()" style="background:#ffc107; color:black;">Update Student</button>
+    <hr>
+    <h4>Edit / Update Profile</h4>
+    <input id="searchRoll" placeholder="Enter CURRENT Roll No">
+    <input id="newStudentName" placeholder="New Name">
+    <input id="newStudentRoll" placeholder="New Roll No">
+    <button onclick="editStudent()" style="background:#ffc107; color:black;">Update Student</button>
 
-            <hr>
-            <h4>Delete Profile</h4>
-            <input id="deleteStudentId" placeholder="Student ID to remove">
-            <button onclick="deleteStudent()" style="background:#dc3545;">Delete Student</button>
+    
 
-            <hr>
-            <h4>Register for Event</h4>
-            <input id="studentId" placeholder="Your Student ID">
-            <select id="eventSelect"><option>-- Select Event --</option></select>
-            <button onclick="registerEvent()" style="background:#007bff;">Register</button>
+    <hr>
+    <h4>Register for Event</h4>
+    <input id="studentId" placeholder="Your Roll No"> 
+    <select id="eventSelect"><option>-- Select Event --</option></select>
+    <button onclick="registerEvent()" style="background:#007bff;">Register</button>
 
-            <button class="back-btn" onclick="showSlide('selectionScreen')">← Back</button>
-        </div>
+    <button class="back-btn" onclick="showSlide('selectionScreen')">← Back</button>
+</div>
 
         <div id="organizerSlide" class="form-slide">
             <h2>Organizer Portal</h2>

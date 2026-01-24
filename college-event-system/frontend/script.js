@@ -44,6 +44,24 @@ async function registerEvent() {
     body: JSON.stringify({ student_id: studentId, event_id: eventId })
   }).then(res => res.json()).then(data => alert("✅ " + data.message));
 }
+async function editStudent() {
+  const currentRoll = document.getElementById("searchRoll").value; 
+  const newName = document.getElementById("newStudentName").value;
+  const newRoll = document.getElementById("newStudentRoll").value;
+
+  if(!currentRoll || !newName || !newRoll) return alert("Please fill all fields");
+
+  const studentId = await getStudentIdByRoll(currentRoll);
+  if (!studentId) return alert("❌ Current Roll Number not found!");
+
+  fetch(API + "/students/" + studentId, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ name: newName, roll_no: newRoll })
+  })
+  .then(res => res.json())
+  .then(data => alert("✅ " + data.message));
+}
 
 // --- 2. ORGANIZER FUNCTIONS ---
 function addEvent() {

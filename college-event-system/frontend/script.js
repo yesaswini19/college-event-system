@@ -1,4 +1,4 @@
-const API = "https://college-event-system-production.up.railway.app";
+const API = "https://college-event-system-h9i6.vercel.app";
 
 // --- HELPER FUNCTION ---
 // Converts Roll Number to numeric Student ID using your new backend route

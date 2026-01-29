@@ -3,7 +3,7 @@ A professional, full-stack web application designed to streamline the process of
 
 ## 🚀 Live Project Links
 - **Frontend (Live Site):** [View Demo](https://college-event-system-jade.vercel.app/)
-- **Backend API:** [Railway API Endpoint](https://college-event-system-production.up.railway.app)
+- **Backend API:** [Railway API Endpoint](https://college-event-system-h9i6.vercel.app)
 - 
 ## 🛠️ Tech Stack
 ### Frontend

@@ -3,7 +3,16 @@ const express = require("express");
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const db = require("./db");
+// Add this right after const db = require("./db");
+db.query("ALTER TABLE registrations ADD COLUMN IF NOT EXISTS college_name VARCHAR(255)", (err) => {
+    if (err) console.log("College column check: " + err.message);
+    else console.log("College column verified.");
+});
 
+db.query("ALTER TABLE registrations ADD COLUMN IF NOT EXISTS phone_number VARCHAR(20)", (err) => {
+    if (err) console.log("Phone column check: " + err.message);
+    else console.log("Phone column verified.");
+});
 const PORT = process.env.PORT || 5000;
 const app = express();
 app.use(cors());

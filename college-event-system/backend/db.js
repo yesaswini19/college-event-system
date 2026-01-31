@@ -1,15 +1,20 @@
 const mysql = require("mysql2");
 
-const db = mysql.createPool({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASS,
-  database: process.env.DB_NAME,
-  port: process.env.DB_PORT,
+// Create the connection pool
+const pool = mysql.createPool({
+  host: "mysql-87c8ad9-yesaswinipamidi19-4d96.h.aivencloud.com",
+  port: 13682,
+  user: "avnadmin",
+  password: process.env.DB_PASSWORD, // We'll set this in Vercel
+  database: "defaultdb",
+  ssl: {
+    rejectUnauthorized: false, // Required for Aiven's "REQUIRED" SSL mode
+  },
   waitForConnections: true,
-  connectionLimit: 10,
+  connectionLimit: 10,       // Keeps you safe under Aiven's free limit
   queueLimit: 0,
-  ssl: { rejectUnauthorized: false } // Add this for cloud databases!
 });
 
-module.exports = db;
+// Use the promise wrapper for easier async/await if you prefer, 
+// but for your current code, we'll export the standard pool.
+module.exports = pool;

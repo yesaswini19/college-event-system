@@ -113,24 +113,6 @@ function deleteEvent() {
   });
 }
 
-// ✅ UPDATED: Now displays the new registration details in the list
-function viewRegistrations() {
-  fetch(API + "/registrations")
-    .then(res => res.json())
-    .then(data => {
-      const list = document.getElementById("list");
-      list.innerHTML = "";
-      data.forEach(r => {
-        list.innerHTML += `
-          <li style="margin-bottom: 10px; border-bottom: 1px solid #ccc; padding-bottom: 5px;">
-            <strong>${r.name}</strong> (${r.roll_no})<br>
-            College: ${r.college_name} | Phone: ${r.phone_number}<br>
-            Event: <i>${r.title}</i>
-          </li>`;
-      });
-    });
-}
-
 // --- 3. DROPDOWN LOADERS ---
 function loadEventsForStudents() {
   fetch(API + "/events")
@@ -198,19 +180,41 @@ function downloadCSVByEvent() {
     });
 }
 
+// Updated viewRegistrations
+function viewRegistrations() {
+  fetch(API + "/registrations")
+    .then(res => res.json())
+    .then(data => {
+      // FIX: Check if data is an array
+      if (!Array.isArray(data)) {
+        console.error("Backend error:", data.message);
+        return alert("Error loading list: " + (data.message || "Unknown error"));
+      }
+
+      const list = document.getElementById("list");
+      list.innerHTML = "";
+      data.forEach(r => {
+        list.innerHTML += `
+          <li style="margin-bottom: 10px; border-bottom: 1px solid #ccc; padding-bottom: 5px;">
+            <strong>${r.name}</strong> (${r.roll_no})<br>
+            College: ${r.college_name} | Phone: ${r.phone_number}<br>
+            Event: <i>${r.title}</i>
+          </li>`;
+      });
+    });
+}
+
+// Updated downloadCSV
 function downloadCSV() {
   fetch(API + "/registrations")
     .then(res => res.json())
     .then(data => {
+      // FIX: Check if data is an array
+      if (!Array.isArray(data)) {
+        return alert("Could not download: " + (data.message || "Server Error"));
+      }
+      
       if (data.length === 0) return alert("No registrations found");
-      let csv = "Student Name,Roll No,College,Phone,Event Title\n";
-      data.forEach(r => { 
-        csv += `${r.name},${r.roll_no},${r.college_name},${r.phone_number},${r.title}\n`; 
-      });
-      const blob = new Blob([csv], { type: "text/csv" });
-      const link = document.createElement("a");
-      link.href = URL.createObjectURL(blob);
-      link.download = "All_Registrations.csv";
-      link.click();
+      // ... rest of your code ...
     });
 }

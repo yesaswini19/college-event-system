@@ -204,17 +204,39 @@ function viewRegistrations() {
     });
 }
 
-// Updated downloadCSV
+// ✅ FULLY FIXED: Updated downloadCSV
 function downloadCSV() {
   fetch(API + "/registrations")
     .then(res => res.json())
     .then(data => {
-      // FIX: Check if data is an array
+      // 1. Safety Check: Ensure data is a valid list
       if (!Array.isArray(data)) {
+        console.error("Download Error:", data.message);
         return alert("Could not download: " + (data.message || "Server Error"));
       }
       
-      if (data.length === 0) return alert("No registrations found");
-      // ... rest of your code ...
+      // 2. Data Check: Ensure there is actually something to download
+      if (data.length === 0) return alert("No registrations found to download.");
+
+      // 3. Create CSV Content
+      let csv = "Student Name,Roll No,College,Phone,Event Title\n";
+      data.forEach(r => { 
+        // We use template literals and quotes to handle potential commas in names
+        csv += `"${r.name}","${r.roll_no}","${r.college_name}","${r.phone_number}","${r.title}"\n`; 
+      });
+
+      // 4. Trigger Download
+      const blob = new Blob([csv], { type: "text/csv" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = "All_Registrations_Export.csv";
+      link.click();
+      
+      // Clean up the URL object
+      URL.revokeObjectURL(link.href);
+    })
+    .catch(err => {
+      console.error("Fetch error:", err);
+      alert("Network error occurred while trying to download.");
     });
 }

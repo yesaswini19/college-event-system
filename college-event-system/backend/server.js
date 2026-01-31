@@ -205,15 +205,38 @@ app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
 app.get("/fix-my-entire-db", (req, res) => {
-  const fixRegistrations = `ALTER TABLE registrations ADD COLUMN IF NOT EXISTS college_name VARCHAR(255), ADD COLUMN IF NOT EXISTS phone_number VARCHAR(20)`;
-  const fixEvents = `ALTER TABLE events ADD COLUMN IF NOT EXISTS event_location VARCHAR(255)`; // Example addition
+  const fixRegistrations = `
+    ALTER TABLE registrations 
+    ADD COLUMN college_name VARCHAR(255), 
+    ADD COLUMN phone_number VARCHAR(20)
+  `;
 
+  const fixEvents = `
+    ALTER TABLE events 
+    ADD COLUMN event_location VARCHAR(255)
+  `;
+
+  // Update Registrations Table
   db.query(fixRegistrations, (err) => {
-    if (err) return res.status(500).json({ error: "Registrations table error: " + err.message });
-    
+    // If error isn't "column already exists", stop and show error
+    if (err && err.code !== 'ER_DUP_COLUMNNAME') {
+      return res.status(500).json({ error: "Registrations table error: " + err.message });
+    }
+
+    // Update Events Table
     db.query(fixEvents, (err) => {
-      if (err) return res.status(500).json({ error: "Events table error: " + err.message });
-      res.send("<h1>✅ Both tables updated!</h1>");
+      if (err && err.code !== 'ER_DUP_COLUMNNAME') {
+        return res.status(500).json({ error: "Events table error: " + err.message });
+      }
+
+      // If both succeed (or columns already exist)
+      res.send(`
+        <div style="font-family: sans-serif; text-align: center; padding-top: 50px;">
+          <h1>✅ Database Tables Updated!</h1>
+          <p>Registrations table and Events table are now in sync.</p>
+          <a href="/" style="color: blue;">Go back to Home</a>
+        </div>
+      `);
     });
   });
 });

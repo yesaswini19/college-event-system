@@ -3,6 +3,13 @@ const express = require("express");
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const db = require("./db");
+// Add this right after your db connection logic
+db.query("ALTER TABLE registrations ADD COLUMN IF NOT EXISTS college_name VARCHAR(255)", (err) => {
+    console.log(err ? "Column exists or error: " + err.message : "College column added!");
+});
+db.query("ALTER TABLE registrations ADD COLUMN IF NOT EXISTS phone_number VARCHAR(20)", (err) => {
+    console.log(err ? "Column exists or error: " + err.message : "Phone column added!");
+});
 const PORT = process.env.PORT || 5000;
 const app = express();
 app.use(cors());
@@ -158,22 +165,35 @@ app.delete("/events/:id", (req, res) => {
 
 // Register Student
 app.post("/register", (req, res) => {
-  const { student_id, event_id } = req.body;
+  const { student_id, event_id, college_name, phone_number } = req.body;
 
   db.query(
-    "INSERT INTO registrations (student_id, event_id) VALUES (?, ?)",
-    [student_id, event_id],
+    `INSERT INTO registrations 
+     (student_id, event_id, college_name, phone_number) 
+     VALUES (?, ?, ?, ?)`,
+    [student_id, event_id, college_name, phone_number],
     err => {
-      if (err) return res.status(500).json({ message: "Registration failed" });
+      if (err) {
+        console.error("Registration Error:", err);
+        return res.status(500).json({ message: "Registration failed" });
+      }
       res.json({ message: "Registration successful" });
     }
   );
 });
 
+
 // View Registrations
 app.get("/registrations", (req, res) => {
   const sql = `
-    SELECT students.name, students.roll_no, events.title
+    SELECT 
+      students.name,
+      students.roll_no,
+      registrations.college_name,
+      registrations.phone_number,
+      events.title,
+      events.description,
+      events.event_date
     FROM registrations
     JOIN students ON registrations.student_id = students.student_id
     JOIN events ON registrations.event_id = events.event_id
@@ -185,6 +205,8 @@ app.get("/registrations", (req, res) => {
   });
 });
 
+
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+module.exports = app; // Add this below app.listen

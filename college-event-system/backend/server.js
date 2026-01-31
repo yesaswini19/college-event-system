@@ -3,13 +3,7 @@ const express = require("express");
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const db = require("./db");
-// Add this right after your db connection logic
-db.query("ALTER TABLE registrations ADD COLUMN IF NOT EXISTS college_name VARCHAR(255)", (err) => {
-    console.log(err ? "Column exists or error: " + err.message : "College column added!");
-});
-db.query("ALTER TABLE registrations ADD COLUMN IF NOT EXISTS phone_number VARCHAR(20)", (err) => {
-    console.log(err ? "Column exists or error: " + err.message : "Phone column added!");
-});
+
 const PORT = process.env.PORT || 5000;
 const app = express();
 app.use(cors());

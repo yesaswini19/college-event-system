@@ -1,7 +1,6 @@
 const API = "https://college-event-system-h9i6.vercel.app";
 
 // --- HELPER FUNCTION ---
-// Converts Roll Number to numeric Student ID using your new backend route
 async function getStudentIdByRoll(roll) {
   try {
     const res = await fetch(API + "/students/roll/" + roll);
@@ -29,11 +28,18 @@ function addStudent() {
   });
 }
 
-// UPDATED: Now looks up ID by Roll No automatically
+// ✅ UPDATED: Now collects and sends College Name and Phone Number
 async function registerEvent() {
-  const rollNo = document.getElementById("studentId").value; // Input where student types Roll No
+  const rollNo = document.getElementById("studentId").value; 
   const eventId = document.getElementById("eventSelect").value;
-  if(!rollNo || !eventId) return alert("Select event and enter Roll No");
+  
+  // New input fields required by your updated backend
+  const collegeName = document.getElementById("collegeName").value;
+  const phoneNumber = document.getElementById("phoneNumber").value;
+
+  if(!rollNo || !eventId || !collegeName || !phoneNumber) {
+    return alert("❌ Please fill all fields: Roll No, Event, College Name, and Phone Number");
+  }
 
   const studentId = await getStudentIdByRoll(rollNo);
   if (!studentId) return alert("❌ Roll Number not found. Please create a profile first.");
@@ -41,9 +47,23 @@ async function registerEvent() {
   fetch(API + "/register", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ student_id: studentId, event_id: eventId })
-  }).then(res => res.json()).then(data => alert("✅ " + data.message));
+    body: JSON.stringify({ 
+      student_id: studentId, 
+      event_id: eventId,
+      college_name: collegeName,
+      phone_number: phoneNumber
+    })
+  })
+  .then(res => res.json())
+  .then(data => {
+    if(data.message.includes("successful")) {
+        alert("✅ " + data.message);
+    } else {
+        alert("❌ " + data.message);
+    }
+  });
 }
+
 async function editStudent() {
   const currentRoll = document.getElementById("searchRoll").value; 
   const newName = document.getElementById("newStudentName").value;
@@ -72,7 +92,7 @@ function addEvent() {
   fetch(API + "/events", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ title, description, event_date: date }) // Ensure key matches server.js
+    body: JSON.stringify({ title, description, event_date: date })
   }).then(res => res.json()).then(data => {
     alert("Event Added!");
     loadEventsForOrganizer();
@@ -93,6 +113,7 @@ function deleteEvent() {
   });
 }
 
+// ✅ UPDATED: Now displays the new registration details in the list
 function viewRegistrations() {
   fetch(API + "/registrations")
     .then(res => res.json())
@@ -100,7 +121,12 @@ function viewRegistrations() {
       const list = document.getElementById("list");
       list.innerHTML = "";
       data.forEach(r => {
-        list.innerHTML += `<li>${r.name} (${r.roll_no}) → ${r.title}</li>`;
+        list.innerHTML += `
+          <li style="margin-bottom: 10px; border-bottom: 1px solid #ccc; padding-bottom: 5px;">
+            <strong>${r.name}</strong> (${r.roll_no})<br>
+            College: ${r.college_name} | Phone: ${r.phone_number}<br>
+            Event: <i>${r.title}</i>
+          </li>`;
       });
     });
 }
@@ -157,11 +183,12 @@ function downloadCSVByEvent() {
     .then(res => res.json())
     .then(data => {
       const filtered = data.filter(r => r.title === eventTitle);
-
       if (filtered.length === 0) return alert("No registrations for this event.");
 
-      let csv = "Student Name,Roll No,Event Title\n";
-      filtered.forEach(r => { csv += `${r.name},${r.roll_no},${r.title}\n`; });
+      let csv = "Student Name,Roll No,College,Phone,Event Title\n";
+      filtered.forEach(r => { 
+        csv += `${r.name},${r.roll_no},${r.college_name},${r.phone_number},${r.title}\n`; 
+      });
 
       const blob = new Blob([csv], { type: "text/csv" });
       const link = document.createElement("a");
@@ -176,8 +203,10 @@ function downloadCSV() {
     .then(res => res.json())
     .then(data => {
       if (data.length === 0) return alert("No registrations found");
-      let csv = "Student Name,Roll No,Event Title\n";
-      data.forEach(r => { csv += `${r.name},${r.roll_no},${r.title}\n`; });
+      let csv = "Student Name,Roll No,College,Phone,Event Title\n";
+      data.forEach(r => { 
+        csv += `${r.name},${r.roll_no},${r.college_name},${r.phone_number},${r.title}\n`; 
+      });
       const blob = new Blob([csv], { type: "text/csv" });
       const link = document.createElement("a");
       link.href = URL.createObjectURL(blob);

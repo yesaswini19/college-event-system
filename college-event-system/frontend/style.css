@@ -104,3 +104,34 @@ li { background: #f8f9fa; padding: 10px; margin-bottom: 5px; border-left: 4px so
 .form-slide * {
     pointer-events: auto;
 }
+/* --- KEEP ALL YOUR EXISTING CSS ABOVE --- */
+
+/* Add these lines at the very bottom of your <style> tag */
+
+/* Highlight the new inputs when the student clicks on them */
+input:focus, select:focus {
+    border-color: #007bff;
+    outline: none;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.2);
+}
+
+/* Specific styling for the Registration Section to make it stand out */
+#studentSlide h4:last-of-type {
+    color: #007bff; /* Makes "Register for Event" title blue */
+    font-weight: bold;
+}
+
+/* Ensure the list items handle the new data lines (College/Phone) cleanly */
+li {
+    background: #f8f9fa;
+    padding: 12px;
+    margin-bottom: 8px;
+    border-left: 4px solid #007bff;
+    font-size: 14px;
+    line-height: 1.4; /* Adds space between the name and the college/phone info */
+}
+
+/* Optional: Subtle background color for the new fields to distinguish them from Profile fields */
+#collegeName, #phoneNumber {
+    background-color: #fdfdfd;
+}

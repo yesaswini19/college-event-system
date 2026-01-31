@@ -203,4 +203,17 @@ app.get("/registrations", (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+app.get("/fix-my-entire-db", (req, res) => {
+  const fixRegistrations = `ALTER TABLE registrations ADD COLUMN IF NOT EXISTS college_name VARCHAR(255), ADD COLUMN IF NOT EXISTS phone_number VARCHAR(20)`;
+  const fixEvents = `ALTER TABLE events ADD COLUMN IF NOT EXISTS event_location VARCHAR(255)`; // Example addition
+
+  db.query(fixRegistrations, (err) => {
+    if (err) return res.status(500).json({ error: "Registrations table error: " + err.message });
+    
+    db.query(fixEvents, (err) => {
+      if (err) return res.status(500).json({ error: "Events table error: " + err.message });
+      res.send("<h1>✅ Both tables updated!</h1>");
+    });
+  });
+});
 module.exports = app; // Add this below app.listen
